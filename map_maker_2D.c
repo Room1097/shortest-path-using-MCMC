@@ -29,7 +29,7 @@ City* generate_cities(int num_cities, int map_size) {
 }
 
 void write_map_to_file(City* cities, int num_cities) {
-    FILE* fp = fopen("map.txt", "w");
+    FILE* fp = fopen("map_2D.txt", "w");
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file for writing.\n");
         exit(1);

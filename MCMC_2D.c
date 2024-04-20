@@ -3,8 +3,8 @@
 #include <math.h>
 #include <time.h>
 
-#define N_ITER 10000 // Number of iterations
-#define ALPHA 0.95 // Cooling rate
+int MAX = 10000; // Number of iterations (can be changed)
+float ALPHA = 0.95; // Temperature (we are taking it by default but it can be changed by the user)
 
 typedef struct {
     int x;
@@ -50,7 +50,7 @@ double tour_distance(int* tour, City* cities, int num_cities) {
 
 
 void write_tour_to_file(int* tour, int num_cities) {
-    FILE* fp = fopen("tour.txt", "w");
+    FILE* fp = fopen("tour2D.txt", "w");
     if (fp == NULL) {
         fprintf(stderr, "Failed to open file for writing.\n");
         exit(1);
@@ -86,7 +86,7 @@ void mcmc(City* cities, int num_cities) {
     double current_distance = tour_distance(tour, cities, num_cities);
     double best_distance = current_distance;
 
-    for (int iter = 0; iter < N_ITER; iter++) {
+    for (int iter = 0; iter < MAX; iter++) {
         int i = rand() % num_cities;
         int j = rand() % num_cities;
         if (i == j) continue;
@@ -97,9 +97,10 @@ void mcmc(City* cities, int num_cities) {
         tour[j] = temp;
 
         double new_distance = tour_distance(tour, cities, num_cities);
-        double acceptance_prob = exp((current_distance - new_distance) / ALPHA);
-
-        if (acceptance_prob > (double)rand() / RAND_MAX) {
+        double deltad = current_distance - new_distance;
+        double acceptance_prob = exp((deltad) / ALPHA);
+        
+        if (deltad > 0 || (ALPHA > 0 && acceptance_prob > (double)rand() / RAND_MAX)) {
             current_distance = new_distance;
             if (current_distance < best_distance) {
                 best_distance = current_distance;
@@ -118,8 +119,12 @@ void mcmc(City* cities, int num_cities) {
 }
 
 int main() {
-    char* filename = "map.txt";
+    char* filename = "map_2D.txt";
     int num_cities;
+    printf("Input the value for temperature (it is taken as 0.95 by default to continue with it type 0.95)");
+    scanf("%lf",&ALPHA);
+    printf("Input the value of MAX iteration (it is taken 10000 by default to continue with it type 10000)");
+    scanf("%lf",&MAX);
     City* cities = read_cities(filename, &num_cities);
 
     mcmc(cities, num_cities);
